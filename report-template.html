@@ -1,18 +1,120 @@
-<!doctype html>
-<html lang="zh-CN"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Mermaid KMP Benchmark</title>
+<!DOCTYPE html>
+<!-- Layout and styling adapted from storytellerF/mermaid-rust-benchmark. -->
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mermaid KMP Libraries Benchmark Report</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
 <style>
-:root{font:15px/1.6 system-ui,sans-serif;color:#233440;background:#f6f7f9}*{box-sizing:border-box}body{max-width:1240px;margin:auto;padding:42px 28px}h1{font-size:38px;letter-spacing:-1.5px;margin:12px 0}h2{font-size:25px;margin:0}h3{font-size:18px;margin:0}p{max-width:1050px}.muted,.case-caption,.scale-note{color:#75808b}.panel,.chart-card,.data-details{background:white;border:1px solid #e1e5eb;border-radius:14px;padding:22px}.panel{margin:16px 0;overflow:auto}table{border-collapse:collapse;width:100%;font-size:13px}th,td{padding:12px;text-align:left;border-bottom:1px solid #e8ecf0;vertical-align:top}th{color:#687783;white-space:nowrap}a{color:#4264a1;text-decoration:none}a:hover{text-decoration:underline}code{font-size:12px;word-break:break-word}small{font-size:12px}.failed{color:#a64048}.badge{display:inline-block;color:#317369;background:#e6f0ed;font-size:12px;font-weight:650;padding:5px 12px;border-radius:6px;letter-spacing:.6px}details{margin:18px 0}summary{cursor:pointer;font-weight:550;color:#5b6c79}.chart-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}.section-heading{display:flex;align-items:center;justify-content:space-between;gap:16px;margin:34px 0 18px}.section-heading p{margin:3px 0 0;color:#78838e;font-size:13px}.unit{font-size:12px;color:#687783;white-space:nowrap}.case-caption{font-size:12px;margin:4px 0 26px}.chart-row{margin:22px 0}.chart-label{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:10px;font-size:12px}.library{display:flex;align-items:center;gap:7px}.library i{width:8px;height:8px;border-radius:50%;flex-shrink:0}.chart-label strong{font-size:20px;font-variant-numeric:tabular-nums;white-space:nowrap;letter-spacing:-.6px}.chart-label strong small{font-size:10px;color:#7b8790;font-weight:400;letter-spacing:0}.track{height:14px;background:#f0f2f5;border-radius:4px;overflow:hidden}.fill{height:100%;border-radius:4px;min-width:1px}.chart-meta{display:flex;justify-content:space-between;gap:8px;font-size:11px;color:#7c8790;margin-top:7px}.scale-note{font-size:12px;margin:12px 0}.data-details{padding:13px 18px}.table-scroll{overflow:auto}.missing{font-size:11px;padding:9px;background:#fff4ed;color:#a06843;border-radius:6px}.navigation{display:flex;gap:8px;margin:24px 0}.navigation a{border:1px solid #dce2e9;padding:7px 15px;border-radius:7px;font-size:13px;background:white}.context{font-size:12px;color:#73818c}.support-heading{margin-top:38px}.method-details{font-size:13px;margin-bottom:28px}.method-details summary{font-size:12px}.intro{max-width:850px;font-size:15px;color:#6b7b88}.results-label{font-size:11px;font-weight:650;letter-spacing:1.8px;color:#8b98a1;margin-top:32px}.chart-card{padding:20px;min-width:0}
-@media(max-width:980px){.chart-grid{grid-template-columns:1fr}.chart-card{padding:24px}.chart-label{font-size:14px}.chart-label strong{font-size:24px}.case-caption{margin-bottom:18px}}@media(max-width:600px){body{padding:24px 14px}h1{font-size:29px}.section-heading{align-items:flex-start;flex-direction:column;gap:6px}th,td{padding:8px}}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: linear-gradient(135deg, #667eea11 0%, #764ba211 100%);
+    min-height: 100vh; color: #1e293b; line-height: 1.6;
+}
+.container { max-width: 1400px; margin: 0 auto; padding: 2rem; }
+header {
+    text-align: center; margin-bottom: 3rem;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    padding: 3rem 2rem; border-radius: 20px; color: white;
+    box-shadow: 0 20px 60px rgba(102, 126, 234, 0.3);
+}
+header h1 { font-size: 2.5rem; font-weight: 800; letter-spacing: -0.02em; }
+header p { font-size: 1.1rem; opacity: 0.9; margin-top: 0.5rem; }
+.meta { display: flex; gap: 2rem; justify-content: center; margin-top: 1.5rem; flex-wrap: wrap; }
+.meta-item {
+    background: rgba(255,255,255,0.15); padding: 0.5rem 1.2rem;
+    border-radius: 30px; font-size: 0.9rem; backdrop-filter: blur(10px);
+}
+.section { margin-bottom: 3rem; }
+.section h2 {
+    font-size: 1.6rem; font-weight: 700; margin-bottom: 1.5rem;
+    color: #334155; display: flex; align-items: center; gap: 0.5rem;
+}
+.section h2::before {
+    content: ''; display: inline-block; width: 4px; height: 28px;
+    background: linear-gradient(135deg, #667eea, #764ba2); border-radius: 2px;
+}
+.table-wrap {
+    overflow-x: auto; border-radius: 16px;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+    background: white;
+}
+table { width: 100%; border-collapse: collapse; font-size: 0.92rem; }
+thead th {
+    background: #f8fafc; padding: 1rem; text-align: left; font-weight: 600;
+    color: #475569; border-bottom: 2px solid #e2e8f0; white-space: nowrap;
+    position: sticky; top: 0; z-index: 1;
+}
+tbody td { padding: 0.85rem 1rem; border-bottom: 1px solid #f1f5f9; }
+tbody tr:hover { background: #f8fafc; }
+tbody tr:last-child td { border-bottom: none; }
+.lib-name {
+    font-weight: 600; white-space: nowrap;
+}
+.lib-name a {
+    color: #4f46e5; text-decoration: none;
+    transition: color 0.2s;
+}
+.lib-name a:hover { color: #7c3aed; text-decoration: underline; }
+.version {
+    display: inline-block; font-size: 0.75rem; font-weight: 500;
+    color: #64748b; background: #f1f5f9; padding: 0.1rem 0.5rem;
+    border-radius: 10px; margin-left: 0.5rem;
+}
+.lib-type {
+    font-size: 0.8rem; font-weight: 500; text-align: center;
+}
+.lib-desc { color: #64748b; font-size: 0.85rem; max-width: 320px; }
+.bench-cell {
+    font-variant-numeric: tabular-nums; white-space: nowrap; font-weight: 500;
+}
+.bench-cell .ci {
+    display: block; font-size: 0.72rem; color: #94a3b8; font-weight: 400;
+}
+.bench-cell.na { color: #cbd5e1; font-style: italic; font-weight: 400; }
+.bench-cell.fastest {
+    color: #059669; background: #ecfdf5;
+}
+.bench-header { text-align: center; }
+.charts-grid {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+    gap: 1.5rem;
+}
+.chart-card {
+    background: white; border-radius: 16px; padding: 1.5rem;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.06);
+    height: 340px;
+}
+footer {
+    text-align: center; padding: 2rem; color: #94a3b8; font-size: 0.85rem;
+}
+footer a { color: #6366f1; text-decoration: none; }
+@media (max-width: 768px) {
+    .container { padding: 1rem; }
+    header { padding: 2rem 1rem; }
+    header h1 { font-size: 1.6rem; }
+    .charts-grid { grid-template-columns: 1fr; }
+    .chart-card { height: 280px; }
+}
 </style>
-<header><span class="badge">JMH · JVM · __PROFILE__</span><h1>Mermaid KMP 性能对比</h1><p class="intro">先选测量阶段，再比较同一种图的耗时。柱子越短，处理越快；每次调用均使用同一份 Mermaid 输入。</p></header>
-<nav class="navigation" aria-label="测量阶段"><a href="#svg">SVG 输出</a><a href="#parse">解析</a><a href="#scene">场景生成</a></nav>
-<p class="context">__SUMMARY__ · 简单流程图 / 复杂流程图 / 时序图</p>
-<details class="method-details"><summary>测量方法、环境与比较边界</summary><div class="panel">__ENVIRONMENT__<p>__METHOD__</p><p>这是 Kotlin 源码与 Rust KMP 发布制品在 JVM 上的热态测量，不代表移动端或 Kotlin/Native 性能。<b>mermaid-native 为公共源码的 JVM 适配，上游没有官方桌面 JVM 目标。</b>Rust KMP 使用 alpha5 发布制品，SVG 耗时包含 JNI 调用。内存分配数据仅覆盖 JVM 堆，不含 Rust 原生堆，不能作为两者总内存比较。文本测量、布局和最终输出不同，速度不等于兼容性或画质。不同阶段不参与同一个排名。</p></div></details>
-__TABLES__
-<h2 class="support-heading">检查记录</h2><p>结构检查覆盖节点/边或参与者/消息数；CMP 仅检查成功、非空场景和正尺寸。SVG 包装检查不代表视觉保真。失败项不参与计时。</p>
-<details class="data-details"><summary>查看逐项检查与失败诊断</summary><div class="table-scroll">__PREFLIGHT__</div></details>
-<details class="data-details"><summary>查看候选库、固定版本与测量范围</summary><div class="table-scroll">__LIBRARIES__</div></details>
-<details><summary>未测量和排除的候选</summary>__EXCLUDED__</details>
-<h2>复现与原始数据</h2><p><code>python run_benchmarks.py</code> · <a href="results/jmh.json">JMH 原始结果（含逐轮数据）</a> · <a href="results/environment.json">环境与输入哈希</a> · <a href="results/preflight.json">完整前置检查</a> · <a href="libraries.lock.json">版本锁定</a> · <a href="discovery.json">搜集记录</a> · <a href="discovery-source-comparison.json">独立维护分支的源码核对</a></p>
+</head>
+<body>
+<div class="container">
+<header>
+<h1>Mermaid KMP Libraries Benchmark</h1>
+<p>Performance comparison of Kotlin Multiplatform Mermaid diagram implementations</p>
+<div class="meta">__META__</div>
+</header>
+__SECTIONS__
+__DIAGNOSTICS__
+<footer>Benchmarks powered by <a href="https://github.com/openjdk/jmh">JMH</a>. Lower is better.<br>Average time with 99.9% confidence intervals. Stages are measured separately.</footer>
+</div>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+__CHARTS__
+});
+</script>
+</body>
 </html>

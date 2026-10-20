@@ -82,7 +82,7 @@
       "id": "zusrsoft-diagram",
       "repository": "https://github.com/zusrsoft/diagram",
       "status": "not_measured",
-      "notes": "Independently maintained continuation, not a repository rename. At the inspected commits, all diagram-core common/JVM Kotlin files and all Mermaid parser Kotlin files are byte-identical to huarangmeng/diagram. The only core/parser Kotlin difference is in the unrelated PlantUML activity parser. Shared Mermaid parser code is measured once in this run; this is not a claim of equivalence for the full rendering SDK. See discovery-source-comparison.json.",
+      "notes": "Independently maintained continuation, not a repository rename. At the inspected commits, all diagram-core common/JVM Kotlin files and all Mermaid parser Kotlin files are byte-identical to huarangmeng/diagram. The only core/parser Kotlin difference is in the unrelated PlantUML activity parser. Shared Mermaid parser code is measured once in this run; this is not a claim of equivalence for the full rendering SDK. The comparison is a discovery observation; generated evidence is not committed.",
       "commit": "60ba44c3f1d5349c32725591750cfd71e8ac7998"
     },
     {

@@ -9,3 +9,8 @@
 __pycache__/
 
 public/
+
+/results/
+/report.html
+/_site/
+/discovery-source-comparison.json
