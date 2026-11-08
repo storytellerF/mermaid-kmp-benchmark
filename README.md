@@ -4,8 +4,6 @@
 
 **在线报告：**[storytellerf.github.io/mermaid-kmp-benchmark](https://storytellerf.github.io/mermaid-kmp-benchmark/)
 
-<a id="libraries"></a>
-
 ## 参与比较的库
 
 | 库 | 修订版本／版本号 | 测量的输出 | 说明 |
@@ -18,8 +16,6 @@
 
 完整源码修订版本和 Rust KMP 构件校验和固定在 [libraries.lock.json](libraries.lock.json) 中。候选库清单见 [discovery.json](discovery.json)。
 
-<a id="test-cases"></a>
-
 ## 测试用例
 
 每种支持的操作都使用三份输入进行测量：
@@ -29,8 +25,6 @@
 - **sequence_diagram**：3 个参与者、8 条消息的时序图。
 
 [JMH](https://github.com/openjdk/jmh) 测量操作的平均耗时。解析、场景生成和端到端 SVG 渲染分别报告。预检失败的项目不计入耗时，并在报告中展示。
-
-<a id="run-locally"></a>
 
 ## 本地运行
 
@@ -53,8 +47,6 @@ python run_benchmarks.py --profile smoke
 标准配置启动 2 个 JVM fork，每个执行 5 次预热和 8 次测量，每次 1 秒。冒烟结果仅用于检查执行流程。
 
 报告、原始测量数据、日志和 SVG 样本在本地或 CI 中生成，不提交到仓库。可使用 `python generate_report.py` 从已有测量数据重新生成 HTML。
-
-<a id="interpreting-results"></a>
 
 ## 解读结果
 
