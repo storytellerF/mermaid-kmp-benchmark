@@ -1,10 +1,12 @@
-# Repository guidance
+<a id="repository-guidance"></a>
 
-- Preserve phase boundaries: parse, scene generation, and end-to-end SVG must never share a speed ranking.
-- Keep immutable upstream revisions in libraries.lock.json. Do not modify `.upstream` implementations.
-- Exclude failed structural checks from timings and retain their diagnostics.
-- Maintain canonical user instructions in README.md and developer details in DEVELOPMENT.md.
-- Generated report.html comes from report-template.html and generate_report.py; measurements come only from JMH, never invented placeholders.
-- Verify build changes with :bench:installDist and adapter changes with preflight plus relevant JMH smoke cells. Test report generation using python -m unittest discover -s tests.
+# 仓库工作指引
 
-- Never commit report.html, results/, _site/ or generated comparison evidence. Reports are produced during local runs or CI and published through Pages, following mermaid-rust-benchmark.
+- 保持测量阶段的边界：解析、场景生成和端到端 SVG 生成绝不能放在同一个速度排名中。
+- 在 libraries.lock.json 中固定不可变的上游修订版本。不要修改 `.upstream` 中的实现。
+- 结构检查失败的项目不计入耗时，并保留诊断信息。
+- README.md 作为用户说明的权威文档，DEVELOPMENT.md 记录开发细节。
+- report.html 由 report-template.html 和 generate_report.py 生成；测量值只能来自 JMH，不能使用编造的占位数据。
+- 构建变更通过 :bench:installDist 验证；适配层变更通过预检和相关 JMH 冒烟测量单元验证。报告生成使用 python -m unittest discover -s tests 测试。
+
+- 不得提交 report.html、results/、_site/ 或生成的比较证据。参考 mermaid-rust-benchmark，在本地运行或 CI 中生成报告，再通过 Pages 发布。
