@@ -11,12 +11,14 @@
     {
       "id": "cmp",
       "repository": "https://github.com/swithun-liu/cmp-mermaid",
-      "commit": "3eaad1a383e3542750b49e8870d9648b7dbdbac8",
+      "artifact": "io.github.swithun-liu:mermaid-core:0.1.21",
+      "artifact_url": "https://repo.maven.apache.org/maven2/io/github/swithun-liu/mermaid-core-jvm/0.1.21/",
+      "updated_on": "2026-11-11",
       "status": "measured",
       "stages": [
         "scene"
       ],
-      "notes": "Pure Kotlin; parse + layout + scene construction. Compose painting excluded. Fixed approximate text metrics; not SVG."
+      "notes": "Published Maven Central JVM artifact 0.1.21 with pinned SHA-256. Replaces the former source snapshot 3eaad1a383e3542750b49e8870d9648b7dbdbac8 because the GitHub repository is no longer publicly accessible; no equivalence to that commit is claimed. Parse + layout + scene construction through MermaidEngine.render. Compose painting excluded. Fixed approximate text metrics; not SVG."
     },
     {
       "id": "native",

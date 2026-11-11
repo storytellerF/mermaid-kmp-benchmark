@@ -11,10 +11,10 @@
 | [mermaid-rust-kmp](https://github.com/storytellerF/mermaid-rust-kmp) | 0.0.1-alpha5 | SVG | 通过 JNI 调用 Rust 的公开 KMP API |
 | [mermaid-native](https://github.com/botiverse/mermaid-native) | 01c34d8b | 解析、SVG | 基于纯 Kotlin 通用源码适配的 JVM 版本 |
 | [lugf027/mermaid](https://github.com/lugf027/mermaid) | f73ba76b | 解析、SVG | 纯 Kotlin Mermaid 解析器与 SVG 渲染器 |
-| [cmp-mermaid](https://github.com/swithun-liu/cmp-mermaid) | 3eaad1a3 | 场景 | 解析、布局及 Compose 场景生成，不包括绘制 |
+| [cmp-mermaid](https://repo.maven.apache.org/maven2/io/github/swithun-liu/mermaid-core-jvm/0.1.21/) | 0.1.21 | 场景 | Maven Central 发布的 JVM 构件；解析、布局及场景生成，不包括 Compose 绘制 |
 | [huarangmeng/diagram](https://github.com/huarangmeng/diagram) | bc709ec1 | 解析 | Mermaid 词法分析、语法解析及 IR 快照 |
 
-完整源码修订版本和 Rust KMP 构件校验和固定在 [libraries.lock.json](libraries.lock.json) 中。候选库清单见 [discovery.json](discovery.json)。
+完整源码修订版本及 CMP、Rust KMP 的构件版本和 SHA-256 固定在 [libraries.lock.json](libraries.lock.json) 中。候选库清单见 [discovery.json](discovery.json)。CMP 原 GitHub 仓库目前不可公开访问，现使用 Maven Central 0.1.21；这是测量版本变更，不等同于此前的 3eaad1a3 源码快照，旧版与新版结果应分别解读。
 
 ## 测试用例
 

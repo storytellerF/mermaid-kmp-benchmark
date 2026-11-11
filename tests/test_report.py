@@ -59,6 +59,42 @@ class ReportTests(unittest.TestCase):
             self.assertIn("&lt;bad&gt;", report)
             self.assertNotIn("0.00 µs", report)
 
+    def test_cmp_uses_recorded_artifact_version_and_central_link(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            self.fixture(root, [row("cmp:scene")], [])
+            central = "https://repo.maven.apache.org/maven2/example/cmp/0.1.21/"
+            (root / "discovery.json").write_text(json.dumps({"candidates": [{
+                "id": "cmp", "status": "measured", "repository": "https://github.com/example/cmp",
+                "artifact": "example:cmp:0.1.21", "artifact_url": central, "commit": "old-source-revision"
+            }]}), encoding="utf-8")
+            (root / "results/environment.json").write_text(json.dumps({
+                "started_utc": "test", "libraries": {"cmp": {"artifact": "example:cmp:0.1.21"}}
+            }), encoding="utf-8")
+            generate_report.generate(root)
+            report = (root / "report.html").read_text(encoding="utf-8")
+            self.assertIn('class="version">0.1.21', report)
+            self.assertIn(f'href="{central}"', report)
+            self.assertNotIn("old-sour", report)
+
+    def test_historical_cmp_source_result_keeps_recorded_revision(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            self.fixture(root, [row("cmp:scene")], [])
+            repository = "https://github.com/example/cmp"
+            (root / "discovery.json").write_text(json.dumps({"candidates": [{
+                "id": "cmp", "status": "measured", "repository": repository,
+                "artifact": "example:cmp:0.1.21", "artifact_url": "https://example.test/0.1.21/"
+            }]}), encoding="utf-8")
+            (root / "results/environment.json").write_text(json.dumps({
+                "started_utc": "test", "libraries": {"cmp": {"commit": "3eaad1a383e3542750b49e8870d9648b7dbdbac8"}}
+            }), encoding="utf-8")
+            generate_report.generate(root)
+            report = (root / "report.html").read_text(encoding="utf-8")
+            self.assertIn('class="version">3eaad1a3', report)
+            self.assertIn(f'href="{repository}"', report)
+            self.assertNotIn("0.1.21", report)
+
     def test_empty_results_fail_instead_of_publishing_blank_report(self):
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)

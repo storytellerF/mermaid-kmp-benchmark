@@ -10,6 +10,9 @@ def run(*args):
 
 def prepare():
     for name, library in json.loads((ROOT / "libraries.lock.json").read_text()).items():
+        if library.get("artifact") and "commit" not in library:
+            print(f"{name}: published artifact {library['artifact']} (verified by Gradle)", flush=True)
+            continue
         destination = ROOT / ".upstream" / name
         if not destination.exists():
             destination.mkdir(parents=True)

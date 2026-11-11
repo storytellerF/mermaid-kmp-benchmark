@@ -90,7 +90,9 @@ def generate(root=ROOT):
             continue
         lock = environment.get("libraries", {}).get(entry["id"], {})
         artifact = lock.get("artifact", "")
-        libraries[entry["id"]] = {"repository": entry["repository"], "version": artifact.split(":")[-1] if artifact else entry.get("commit", "source")[:8], "description": DESCRIPTIONS.get(entry["id"], "")}
+        url = entry.get("artifact_url", entry["repository"]) if artifact and artifact == entry.get("artifact") else entry["repository"]
+        version = artifact.split(":")[-1] if artifact else lock.get("commit", entry.get("commit", "source"))[:8]
+        libraries[entry["id"]] = {"repository": url, "version": version, "description": DESCRIPTIONS.get(entry["id"], "")}
     sections, charts = render_results(rows, libraries)
     cases = {r["params"]["caseName"] for r in rows}
     groups = {r["params"]["operation"].split(":")[0] for r in rows}

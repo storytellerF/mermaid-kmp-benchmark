@@ -1,10 +1,8 @@
 {
   "cmp": {
     "repository": "swithun-liu/cmp-mermaid",
-    "commit": "3eaad1a383e3542750b49e8870d9648b7dbdbac8",
-    "modules": [
-      "mermaid-core"
-    ]
+    "artifact": "io.github.swithun-liu:mermaid-core:0.1.21",
+    "jvm_artifact_sha256": "8c6c6a696d4f436aaa8e5d084110b5d544ee5dc92371b9526b2786e027676025"
   },
   "native": {
     "repository": "botiverse/mermaid-native",

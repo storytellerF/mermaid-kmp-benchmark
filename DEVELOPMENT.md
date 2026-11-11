@@ -12,15 +12,19 @@ python run_benchmarks.py --profile smoke
 python -m unittest discover -s tests
 ```
 
-Unix 系统上确保 `gradlew` 可执行（`chmod +x gradlew`）。`prepare.py` 在 `.upstream/` 获取固定修订版本的稀疏检出，核验 HEAD，并拒绝存在受跟踪文件修改的检出。更换版本时，显式更新 `libraries.lock.json`，再使用新的干净检出；不得通过修改下载的实现来提高分数。
+Unix 系统上确保 `gradlew` 可执行（`chmod +x gradlew`）。`prepare.py` 在 `.upstream/` 获取固定修订版本的稀疏检出，核验 HEAD，并拒绝存在受跟踪文件修改的检出。仅使用发布构件且不记录源码提交的库（当前为 CMP）不执行 Git 拉取；源码依赖拉取失败仍中止运行。更换源码版本时，显式更新 `libraries.lock.json`，再使用新的干净检出；不得通过修改下载的实现来提高分数。
 
 ## 架构
 
-四个 Kotlin 上游实现分别在独立、包含 JVM 目标的 KMP 模块中编译。Rust KMP 使用固定的 Maven Central 构件 `io.github.storytellerf:mermaidffi-kmp:0.0.1-alpha5`；源码检出仅记录来源，不重新构建。`:bench:verifyRustArtifact` 在 installDist 之前，根据 libraries.lock.json 核验解析得到的 JVM JAR 的 SHA-256。`bench` 管理 Kotlin 适配层和 Java JMH 入口；使用 Java 是为了 JMH 注解处理器，与并发无关。基准测试不使用自定义计时循环。源码资源加载和结构预检在 trial setup 中执行，不计入测量。引擎会复用；每次操作重新解析源码，测试工具不提供预生成场景或输出缓存。库自身的内部行为予以保留。
+Native、lugf 和 diagram 三个 Kotlin 上游实现分别在独立、包含 JVM 目标的 KMP 模块中编译。CMP 使用固定的 Maven Central 构件 `io.github.swithun-liu:mermaid-core:0.1.21`，Gradle 选择其 JVM 发布物 `mermaid-core-jvm-0.1.21.jar`；Rust KMP 使用 `io.github.storytellerf:mermaidffi-kmp:0.0.1-alpha5`，源码检出仅记录来源，不重新构建。`:bench:verifyPublishedArtifacts` 在编译和 installDist 之前，根据 `libraries.lock.json` 核验实际解析得到的 CMP、Rust KMP JVM JAR 坐标、版本和 SHA-256；不匹配会中止构建。CMP 的预期 SHA-256 来自 Maven Central 的 [Gradle 发布元数据](https://repo.maven.apache.org/maven2/io/github/swithun-liu/mermaid-core-jvm/0.1.21/mermaid-core-jvm-0.1.21.module)，并与实际下载的 JAR 核对。CMP 不再依赖 GitHub 源码检出，也不重新编译其实现。
+
+2026-11-11 将 CMP 从源码快照 `3eaad1a383e3542750b49e8870d9648b7dbdbac8` 改为发布物 0.1.21，原因是原 GitHub 仓库及固定提交无法公开访问。发布物未提供可核实的 Git 提交映射，不声称与旧快照等价。报告从本次运行的锁定元数据读取版本；不得把旧快照结果当作 0.1.21 的结果。
+
+`bench` 管理 Kotlin 适配层和 Java JMH 入口；使用 Java 是为了 JMH 注解处理器，与并发无关。基准测试不使用自定义计时循环。源码资源加载和结构预检在 trial setup 中执行，不计入测量。引擎会复用；每次操作重新解析源码，测试工具不提供预生成场景或输出缓存。库自身的内部行为予以保留。
 
 `diagram` 将 core 和 parser 源码合并，使适配层能够使用其词法分析器。Native 合并四个纯模块，补充必需的 clock actual 和上游生成的版本常量。本测试语料不使用该版本常量。有意不应用上游平台或构建插件，因此无需 Android SDK 或 Apple 工具链。源码保持不变。
 
-源码模块依赖使用 Kotlin 2.3.21、serialization JSON 1.10.0 和 coroutines 1.11.0；CMP 还使用 kaml 0.104.0 和 datetime 0.7.1。这些是本基准测试的工具链选择，不代表上游发布版本的依赖。
+源码模块依赖使用 Kotlin 2.3.21、serialization JSON 1.10.0 和 coroutines 1.11.0。这些是本基准测试的工具链选择，不代表上游发布版本的依赖。CMP 由发布元数据引入 kaml 0.104.0、datetime 0.7.1 等运行时依赖；共享依赖由当前 Gradle 依赖图解析。
 
 ## 语料与验证
 
@@ -40,7 +44,7 @@ Unix 系统上确保 `gradlew` 可执行（`chmod +x gradlew`）。`prepare.py` 
 
 ## CI
 
-`.github/workflows/deploy-pages.yml` 参考 mermaid-rust-benchmark：涉及相关路径的 main push 和手动触发会执行标准基准测试，上传 Pages 包，再由依赖它的 `deploy` 作业自动部署。没有单独的发布输入或 pull request 冒烟工作流。Pages 包包含作为 index.html 的报告，以及关联的 JSON 数据和 SVG 样本。Pages 并发使用 `pages` 组，并启用 cancel-in-progress。在仓库设置中选择通过 GitHub Actions 启用 Pages。不同硬件上的运行不能合并成同一个排名；本地和在线 CI 测量各自描述其环境。本地脚本只生成文件。
+`.github/workflows/deploy-pages.yml` 参考 mermaid-rust-benchmark：涉及相关路径的 main push 和手动触发会执行标准基准测试，上传 Pages 包，再由依赖它的 `deploy` 作业自动部署。`.github/workflows/verify-pr.yml` 在面向 main 的 pull request 上执行 Python 单元测试、完整 JMH 冒烟流程（含构建和发布构件校验）及 JVM 测试，仅授予读取源码权限，不上传或部署 Pages。没有单独的发布输入。Pages 包包含作为 index.html 的报告，以及关联的 JSON 数据和 SVG 样本。Pages 并发使用 `pages` 组，并启用 cancel-in-progress。在仓库设置中选择通过 GitHub Actions 启用 Pages。不同硬件上的运行不能合并成同一个排名；本地和在线 CI 测量各自描述其环境。本地脚本只生成文件。
 
 ## 来源与许可
 

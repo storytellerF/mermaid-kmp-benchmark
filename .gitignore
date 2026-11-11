@@ -1,6 +1,6 @@
 .gradle/
+.kotlin/
 /build/
-/cmp/build/
 /native/build/
 /lugf/build/
 /diagram/build/
