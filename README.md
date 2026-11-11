@@ -46,7 +46,7 @@ python run_benchmarks.py --profile smoke
 
 标准配置启动 2 个 JVM fork，每个执行 5 次预热和 8 次测量，每次 1 秒。冒烟结果仅用于检查执行流程。
 
-报告、原始测量数据、日志和 SVG 样本在本地或 CI 中生成，不提交到仓库。可使用 `python generate_report.py` 从已有测量数据重新生成 HTML。
+报告、原始测量数据、日志和 SVG 样本在本地或 CI 中生成，不提交到仓库。可使用 `python generate_report.py` 从已有测量数据重新生成 HTML。报告默认跟随系统明暗主题，打开期间切换系统主题也会同步更新表格和图表。
 
 ## 解读结果
 

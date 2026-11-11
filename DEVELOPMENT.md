@@ -34,7 +34,7 @@ Unix 系统上确保 `gradlew` 可执行（`chmod +x gradlew`）。`prepare.py` 
 
 每个成功的测量单元使用独立 JMH 进程、JSON 和日志，超时为 300 秒。失败会被记录，不能作为快速结果报告。汇总只包含本次调用的结果。报告沿用 mermaid-rust-benchmark 的渐变页头、结果矩阵、最快单元高亮和 Chart.js 横向图表，包括参考配色、字体和卡片样式。每个 KMP 测量阶段都有独立的矩阵和图表组。JMH 报告平均耗时及 99.9% 置信区间，不能将其标为 Criterion 的中位数。原始 JSON 中的 JVM 分配指标不包含 Rust 原生堆分配。
 
-`generate_report.py` 根据当前 JMH 数据渲染 `report-template.html`。模板的视觉样式改编自 mermaid-rust-benchmark。报告从与参考报告相同的 CDN 加载 Chart.js 4。`tests` 覆盖阶段分离、缺失测量值、安全渲染数据和失败行处理；`:bench:test` 覆盖 SVG 验证。
+`generate_report.py` 根据当前 JMH 数据渲染 `report-template.html`。模板的视觉样式改编自 mermaid-rust-benchmark。报告从与参考报告相同的 CDN 加载 Chart.js 4。页面通过 CSS 的 `prefers-color-scheme` 跟随系统；图表从相同的 CSS 变量读取文字、网格和提示框颜色，在系统主题变化、页面重新显示及恢复可见时重绘，保留测量数据与图表语义颜色。`tests` 覆盖阶段分离、缺失测量值、安全渲染数据和失败行处理；`:bench:test` 覆盖 SVG 验证。
 
 生成的 `report.html`、`results/`（含原始 JSON、环境记录、日志和 SVG 样本）、`_site/` 以及临时源码比较证据均被忽略。不得提交基准测试输出或机器专用的结果快照。只提交输入、元数据、代码和报告模板。CI 自行生成报告并通过 Pages 发布，不将产物提交回 Git。
 
@@ -45,3 +45,15 @@ Unix 系统上确保 `gradlew` 可执行（`chmod +x gradlew`）。`prepare.py` 
 ## 来源与许可
 
 上游代码通过获取方式使用，而非随仓库内置，仍遵循各自的 MIT/Apache-2.0 许可证。参阅固定提交中的上游 LICENSE/NOTICE。语料来源为参考仓库；这里不表示对上游内容整体重新授权。
+
+## 报告主题回归验证
+
+可选的浏览器测试需要 Playwright Python 包和 Chromium；不具备 Playwright 时，普通单元测试会明确跳过浏览器用例：
+
+```sh
+python -m pip install playwright
+python -m playwright install chromium
+python -m unittest discover -s tests
+```
+
+测试优先使用已安装的 Google Chrome，否则使用 Playwright Chromium。覆盖首次 light/dark、打开期间双向切换、返回与重新加载、正文及交互配色的 4.5:1 对比度、图表数据和语义颜色保持不变，以及 CDN 失败时仍可读取表格与诊断。浏览器需要网络加载报告使用的 Chart.js CDN；网络受限时应如实报告未完成图表验证。主题测试夹具仅用于行为断言，不作为基准测量发布。真实视觉验证应从已有 JMH `results/` 重新生成报告，分别查看表格、图表、诊断和窄屏布局，不提交输出文件。

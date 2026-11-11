@@ -28,7 +28,7 @@ class ReportTests(unittest.TestCase):
     def test_each_stage_has_separate_matrix_and_charts(self):
         sections, charts = generate_report.render_results([row("rust-kmp:svg"), row("native:parse")])
         self.assertEqual(sections.count("<table>"), 2)
-        self.assertEqual(charts.count("new Chart("), 2)
+        self.assertEqual(charts.count("createReportChart("), 2)
         svg, parse = sections.split('<div class="section" id="parse">')
         self.assertIn("mermaid-rust-kmp", svg)
         self.assertNotIn("mermaid-rust-kmp", parse)

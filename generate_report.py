@@ -68,8 +68,8 @@ def render_results(rows, libraries=None):
             chart_index += 1
             color = COLORS[case_index % len(COLORS)]
             datasets = {"labels": [LIBRARY_NAMES.get(g, g) for g in present], "datasets": [{"label": case + " (µs)", "data": [data[g, case]["score"] for g in present], "backgroundColor": color + "44", "borderColor": color, "borderWidth": 2, "borderRadius": 6}]}
-            options = {"responsive": True, "maintainAspectRatio": False, "indexAxis": "y", "plugins": {"legend": {"display": False}, "title": {"display": True, "text": case, "font": {"size": 16, "weight": "600"}, "color": "#1e293b", "padding": {"bottom": 16}}}, "scales": {"x": {"beginAtZero": True, "title": {"display": True, "text": "Time (µs)", "font": {"size": 13}}, "grid": {"color": "#e2e8f0"}, "ticks": {"font": {"size": 12}}}, "y": {"grid": {"display": False}, "ticks": {"font": {"size": 13, "weight": "500"}}}}}
-            charts.append(f'new Chart(document.getElementById("{chart_id}").getContext("2d"), {{type: "bar", data: {script_json(datasets)}, options: {script_json(options)}}});')
+            options = {"responsive": True, "maintainAspectRatio": False, "indexAxis": "y", "plugins": {"legend": {"display": False}, "title": {"display": True, "text": case, "font": {"size": 16, "weight": "600"}, "padding": {"bottom": 16}}}, "scales": {"x": {"beginAtZero": True, "title": {"display": True, "text": "Time (µs)", "font": {"size": 13}}, "grid": {}, "ticks": {"font": {"size": 12}}}, "y": {"grid": {"display": False}, "ticks": {"font": {"size": 13, "weight": "500"}}}}}
+            charts.append(f'createReportChart(document.getElementById("{chart_id}").getContext("2d"), {{type: "bar", data: {script_json(datasets)}, options: {script_json(options)}}});')
             canvases.append(f'<div class="chart-card"><canvas id="{chart_id}" role="img" aria-label="{esc(output + ": " + case)}"></canvas></div>')
         sections.append(f'<div class="section" id="{stage}"><h2>Results Table · {output}</h2><p>{esc(description)}. Average time; lower is better.</p><div class="table-wrap"><table><thead><tr><th>Library</th><th>Output</th><th>Description</th>{headers}</tr></thead><tbody>{"".join(table_rows)}</tbody></table></div></div><div class="section"><h2>Visual Comparison · {output}</h2><div class="charts-grid">{"".join(canvases)}</div></div>')
     return "".join(sections), "\n".join(charts)
@@ -99,7 +99,7 @@ def generate(root=ROOT):
     diagnostics = ""
     if failures:
         messages = "".join(f'<p>{esc(r["operation"])} / {esc(r["caseName"])}: {esc(r.get("error", "failed"))}</p>' for r in failures)
-        diagnostics = f'<div class="section"><h2>Skipped Measurements</h2>{messages}</div>'
+        diagnostics = f'<div class="section diagnostics"><h2>Skipped Measurements</h2>{messages}</div>'
     result = (root / "report-template.html").read_text(encoding="utf-8")
     for marker, value in {"__META__": "".join(f'<span class="meta-item">{esc(m)}</span>' for m in meta), "__SECTIONS__": sections, "__CHARTS__": charts, "__DIAGNOSTICS__": diagnostics}.items():
         result = result.replace(marker, value)
