@@ -56,4 +56,4 @@ python -m playwright install chromium
 python -m unittest discover -s tests
 ```
 
-测试优先使用已安装的 Google Chrome，否则使用 Playwright Chromium。覆盖首次 light/dark、打开期间双向切换、返回与重新加载、正文及交互配色的 4.5:1 对比度、图表数据和语义颜色保持不变，以及 CDN 失败时仍可读取表格与诊断。浏览器需要网络加载报告使用的 Chart.js CDN；网络受限时应如实报告未完成图表验证。主题测试夹具仅用于行为断言，不作为基准测量发布。真实视觉验证应从已有 JMH `results/` 重新生成报告，分别查看表格、图表、诊断和窄屏布局，不提交输出文件。
+测试优先使用已安装的 Google Chrome，否则使用 Playwright Chromium。覆盖首次 light/dark、打开期间双向切换、返回与重新加载、图表数据和语义颜色保持不变，以及 CDN 失败时仍可读取表格与诊断。测试通过 Chart.js 的 afterRender 等待初始绘制完成，在主题切换后核对原生 Canvas fillText 实际使用的标题颜色，避免仅检查 options 而漏报未重绘。文字对比度从实际元素 computed style 及逐层合成的有效背景计算，包含置信区间、缺失结果、徽章、链接 hover/focus 和诊断；页头检查实际渐变端点及透明元数据背景。辅助程序对不支持的背景类型明确失败，不将变量配色等同于实际元素配色。另有 pageshow 和恢复可见的合成事件隔离测试；这些测试不证明真实 bfcache 恢复。浏览器需要网络加载报告使用的 Chart.js CDN；网络受限时应如实报告未完成图表验证。主题测试夹具仅用于行为断言，不作为基准测量发布。真实视觉验证应从已有 JMH `results/` 重新生成报告，分别查看表格、图表、诊断和窄屏布局，不提交输出文件。
